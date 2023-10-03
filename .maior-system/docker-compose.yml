@@ -1,0 +1,100 @@
+version: '3'
+services:
+  proxy:
+    # platform: linux/x86_64 
+    build:
+      context: ./proxy
+    container_name: ${APP_NAME}-proxy
+    ports:
+      - ${PROXY_PUBLIC_PORT}:80
+      # - ${PROXY_SSH_PORT}:443
+    depends_on:
+      - php
+      - db
+    volumes:
+      - ./proxy/default.conf.template:/etc/nginx/conf.d/default.conf.template
+      - ../php/:/var/www/html
+    environment:
+      APP_NAME: ${APP_NAME}
+      PROJECT_NAME: ${PROJECT_NAME}
+    # 環境変数を渡す
+    command: /bin/sh -c "envsubst '$$PROJECT_NAME' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+  php:
+    # platform: linux/x86_64 
+    build:
+      context: ./php
+      args:
+        PROJECT_NAME: ${PROJECT_NAME}
+        NODEJS_VERSION: ${NODEJS_VERSION}
+        LARAVEL_VERSION: ${LARAVEL_VERSION}
+        USER: ${USER}
+        PASSWORD: ${DB_PASSWORD}
+        # VITE_PORT: ${VITE_PORT}
+    container_name: ${APP_NAME}-php
+    # ports:
+      # - ${PHP_SERVE_PORT}:8000
+      # - ${VITE_PORT}:${VITE_PORT}
+      # - ${REACT_PORT}:3000
+    depends_on:
+      - db
+    volumes:
+      - ../php/:/var/www/html
+      - ./php/log/:/var/log/php/
+    tty: true
+    environment:
+      DB_DATABASE: ${DB_DATABASE}
+      DB_PASSWORD: ${DB_PASSWORD}
+  Phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: ${APP_NAME}-phpmyadmin
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: ${DB_PASSWORD}
+      MEMORY_LIMIT: ${MEMORY_LIMIT}
+      UPLOAD_LIMIT: ${UPLOAD_LIMIT}
+    depends_on:
+      - db
+    ports:
+      - ${PHP_MYADMIN_PUBLIC_PORT}:80
+  db:
+    # platform: 'linux/amd64'
+    container_name: ${APP_NAME}-db
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    volumes:
+      - ./db/log:/var/log/mysql
+      - ./db/data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d
+    expose:
+      - "3306"
+    tty: true
+    environment:
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Tokyo
+  # node jsコンテナ利用する場合はコメントアウト解除する
+  # node:
+  #   # platform: linux/x86_64 
+  #   build:
+  #     context: ./node
+  #     args:
+  #       PROJECT_NAME: ${PROJECT_NAME}
+  #       USER: ${USER}
+  #       PASSWORD: ${DB_PASSWORD}
+  #   container_name: ${APP_NAME}-node
+  #   ports:
+  #     - ${NODE_PORT}:3000
+  #     - ${STRAPI_PORT}:1337
+  #   depends_on:
+  #     - db
+  #   volumes:
+  #     - ../node/:/var/www/html
+  #   tty: true
+  #   environment:
+  #     DB_DATABASE: ${DB_DATABASE}
+  #     DB_PASSWORD: ${DB_PASSWORD}

@@ -1,0 +1,40 @@
+# docker-compose.yml設定
+
+# Dockerで利用する環境変数 ##
+export NODEJS_VERSION='18.x'
+export LARAVEL_VERSION='9.*'
+export PROJECT_ROOT=$(pwd)
+export PROJECT_NAME=
+export APP_NAME=
+export DB_DATABASE=
+export DB_USER=user
+export DB_PASSWORD=password
+export USER=user
+
+# 128Mの形式で指定する
+export MEMORY_LIMIT=128M
+export UPLOAD_LIMIT=64M
+
+# PhpMyadmin servic 公開側ポート
+export PHP_MYADMIN_PUBLIC_PORT=
+# proxy service 公開側ポート
+export PROXY_PUBLIC_PORT=
+# php artisan serveのポート docker-compose.ymlのphpサービスとphp/Dockerfile内のコメントアウトを外す
+export PHP_SERVE_PORT=
+export PROXY_SSH_PORT=
+# viteのポートを利用する場合はdocker-compose.ymlのphpサービスとphp/DockerfileのExposeコメントアウトを外す
+export VITE_PORT=
+# Reactのポート番号を利用する場合はdocker-compose.ymlのphpサービスのコメントアウトを外す
+export REACT_PORT= 
+# バックエンドでNode jsを利用する場合は下記ポートを指定
+export NODE_PORT=
+# バックエンドでNode jsのstrapiを利用する場合は下記ポートを指定する
+export STRAPI_PORT=
+
+## gitセットアップスクリプトで利用する環境変数 ##
+# レポジトリ
+export GIT_REPOSITORY=
+# トークン
+export GIT_TOKEN=
+# ユーザー名
+export GIT_USER=

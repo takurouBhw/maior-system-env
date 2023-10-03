@@ -1,0 +1,9 @@
+/php/*/*
+/node/*/*
+/frontend/
+.envrc
+.env
+configurationCache.log
+dryrun.log
+targets.log
+*.pem

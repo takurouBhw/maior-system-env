@@ -1,0 +1,13 @@
+
+# ↓フォルダ削除。
+sudo rm -rf .maior-system/db/data
+
+以下 実行
+cd .maior-system/
+docker-compose build --no-cache
+docker-compose up -d
+
+maior-system-phpアタッチする
+bash ./install.sh
+cd maior-system
+php artisan migrate
